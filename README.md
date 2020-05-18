@@ -1,1 +1,3 @@
-# lucyacco.com
+---
+permalink: /index.html
+---
