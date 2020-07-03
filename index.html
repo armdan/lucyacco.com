@@ -6,29 +6,27 @@
  {
  	padding: 15px;
  }
-</style>
+ </style>
+
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  <title>Acco client code lookup</title>
-</head>
+  <title>acco</title>
+ </head>
 
 <body>
+
 <div class="container" style="margin-top: 2%;">
-     
 
-<div id="logo" class="text-center">
-    <div class="row justify-content-center">
-        <h5>ProfiTool number lookup</h5>
-    </div>
+      <div id="logo" class="text-center">
+          <div class="row justify-content-center">
+              <h5>ProfiTool number lookup</h5>
+          </div>
+      </div>
 </div>
-
-</div>
-
 
 <div class="container">
-
 	<div class="row justify-content-center">
                         <div class="col-12 col-md-10 col-lg-8">
                             <form class="card card-sm">
@@ -36,22 +34,32 @@
                                     <div class="col">
                                         <input class="form-control form-control-lg form-control-borderless" type="input" id="txt-search" placeholder="Search by number or keywords">
                                     </div>
-                                   
                                 </div>
                             </form>
                         </div>
-                        <!--end of col-->
     </div>
-       <div id="filter-records"></div>
-<noscript><img src="//data.danily.net/ingress/0b33b3c2-8399-4cc2-b2c3-8eecabe894bd/pixel.gif"></noscript> <script src="//data.danily.net/ingress/0b33b3c2-8399-4cc2-b2c3-8eecabe894bd/script.js"></script>
-</div>
+           <div class="row justify-content-center">
+             <span class="spinner-border text-primary" role="status" aria-hidden="true"></span>
+           </div>                       
+                        
+   <div id="filter-records"></div>
+         <noscript><img src="//data.danily.net/ingress/0b33b3c2-8399-4cc2-b2c3-8eecabe894bd/pixel.gif"></noscript> <script src="//data.danily.net/ingress/0b33b3c2-8399-4cc2-b2c3-8eecabe894bd/script.js"></script>
+   </div>
 
 </body>
 </html>
-<script type="text/javascript">
-  $(document).ready(function(){
 
-$.getJSON( "acco_data.json", function( data ) {	  
+<script type="text/javascript">
+$(document).ready(function(){
+
+$.ajax({
+url: 'acco_data.json',
+dataType: "json",
+beforeSend: function() {
+    $('.spinner-border').show();
+},
+success: function(data) {
+	
 $('#txt-search').keyup(function(){	
 	var x, text;
 	x = document.getElementById("txt-search").value;
@@ -61,6 +69,7 @@ $('#txt-search').keyup(function(){
          var searchField = "^"+$(this).val()+"$";
   }
 			if(searchField === '')  {
+				 $('.spinner-border').show();
 				$('#filter-records').html('');
 				return;
 			}
@@ -69,28 +78,34 @@ $('#txt-search').keyup(function(){
             var output = '<div class="row">';
             var count = 1;
 			  $.each(data, function(key, val){
+			  	$('.spinner-border').show();
 				if ((val.old.search(regex) != -1) || (val.vender_name.search(regex) != -1)) {
-               output += '<div class="col-md-6 well">';
-                 output += '<div class="card bg-light mb-3">';                 
-                  output += '<div class="card-header"><h4>' + val.vender_name + '</h4></div>'
-                  output += '<div class="card-body">';                 
-                output += '<h4>Profitool number <span class="badge badge-danger">'+ val.old +'</span></h4>'
-		        output += '<h4>JDE.      number <span class="badge badge-success">'+ val.new +'</span></h4>'
-		           output += '<h4><span class="badge badge-pill badge-dark">'+ val.company +'</span></h4>'
-                          output += '</div>';
-				          output += '</div>';
-				          output += '</div>';
+    output += '<div class="col-md-6 well">';
+    output += '<div class="card bg-light mb-3">';                 
+    output += '<div class="card-header"><h4>' + val.vender_name + '</h4></div>'
+    output += '<div class="card-body">';                 
+    output += '<h4>Profitool number <span class="badge badge-danger">'+ val.old +'</span></h4>'
+	output += '<h4>JDE.      number <span class="badge badge-success">'+ val.new +'</span></h4>'     
+    output += '<h4>AP Specialist:  <span class="badge badge-warning">'+ val.company +'</span></h4>'
+    output += '</div>';
+    output += '<div class="card-footer"><h4><span class="badge badge-info">' + val.company + '</h4></span></div>';
+	output += '</div>';
+	output += '</div>';
+				          
 				  if(count%2 == 0){
 					output += '</div><div class="row">'
 				  }
 				  count++;
-				  
 				}
 			  });
+			  $('.spinner-border').hide();
 			  $('#filter-records').html(output);
 			  
         });
-    });            
+},
+complete: function() {
+    $('.spinner-border').hide();
+}});            
 });
 
 </script>
